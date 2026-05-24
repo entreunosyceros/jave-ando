@@ -1,5 +1,7 @@
 # Ejercicios — POO y Bases de datos con Java
 
+<img width="1536" height="1024" alt="logo" src="https://github.com/user-attachments/assets/747c3176-0838-4bbe-aaa5-15dfd8da2133" />
+
 Colección de ejercicios básicos para practicar la  
 *programación con lenguajes orientados a objetos y bases de datos relacionales*.
 
