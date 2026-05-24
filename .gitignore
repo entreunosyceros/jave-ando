@@ -1,0 +1,8 @@
+# Compilación del visor
+viewer/out/*.class
+viewer/out/com/
+
+
+# Trabajo personal del alumno (JAVe-Ando)
+trabajo/**/*
+!trabajo/README.md
