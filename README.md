@@ -79,6 +79,8 @@ En Windows sustituye `:` por `;` en el classpath.
 
 **Requisitos:** JDK 17+ en `PATH` o variable `JAVA_HOME` configurada (`%JAVA_HOME%\bin` en PATH en Windows).
 
+**Teclado español en Linux:** usa `./viewer/run.sh` para arrancar. El script desactiva `ibus` para esta aplicación (`XMODIFIERS=`), de modo que las tecclas muertas funcionen con una sola pulsación (`´` + `a` → `á`). Si lanzas desde el IDE, define la variable de entorno `XMODIFIERS` vacía en la configuración de ejecución.
+
 Tras modificar el código del visor, vuelve a ejecutar el script de arranque. En Windows, si PowerShell no está disponible, `run.bat` compila el paquete directamente.
 
 Recompilación manual desde `viewer/` (cualquier sistema):

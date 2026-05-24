@@ -158,11 +158,11 @@ public class CodeViewerDialog extends JDialog {
 
     private String hintHtml(Exercise exercise) {
         if (editorMode == EditorMode.STUDENT_WORK) {
-            return "<html>Edita <b>tu código</b> en la carpeta <code>trabajo/</code>. "
-                    + "<b>Guardar</b> no modifica la solución oficial. En varios <code>.java</code>, "
-                    + "conserva <code>// ===== archivo.java =====</code>.</html>";
+            return "<html>Edita <b>tu código</b> en <code>trabajo/</code> (tildes, ñ y teclado español). "
+                    + "<b>Guardar</b> no modifica la solución oficial. "
+                    + "En varios <code>.java</code>, conserva <code>// ===== archivo.java =====</code>.</html>";
         }
-        return "<html>Edita con resaltado de sintaxis. <b>Guardar</b> escribe en la solución oficial. "
+        return "<html>Editor de texto plano (tildes y ñ con teclado español). <b>Guardar</b> escribe en la solución oficial. "
                 + "En varios <code>.java</code>, conserva <code>// ===== archivo.java =====</code>.</html>";
     }
 
@@ -287,11 +287,8 @@ public class CodeViewerDialog extends JDialog {
             south.setBackground(p.bg());
         }
 
-        int caret = codePane.getCaretPosition();
-        String text = codePane.getText();
         codePane.refreshTheme();
-        codePane.setCode(text, language);
-        codePane.setCaretPosition(Math.min(caret, Math.max(0, codePane.getDocument().getLength() - 1)));
+        codePane.refreshHighlightNow();
 
         repaint();
     }

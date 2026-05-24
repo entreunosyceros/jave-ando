@@ -1,6 +1,9 @@
 package com.ifcd0112.viewer;
 
 import javax.swing.ImageIcon;
+import javax.swing.JComponent;
+import javax.swing.UIManager;
+import javax.swing.text.JTextComponent;
 import java.awt.Font;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -26,6 +29,40 @@ public final class PlatformSupport {
     public static boolean isMac() {
         String os = System.getProperty("os.name", "").toLowerCase();
         return os.contains("mac") || os.contains("darwin");
+    }
+
+    public static boolean isLinux() {
+        String os = System.getProperty("os.name", "").toLowerCase();
+        return os.contains("linux") || os.contains("nix") || os.contains("nux");
+    }
+
+    /**
+     * En Linux, ibus + GtkLookAndFeel rompen teclas muertas en Swing (hay que pulsar ´ y la vocal varias veces).
+     * Usar Nimbus/Metal y desactivar el marco IME de Java en campos de texto.
+     */
+    public static void installSwingLookAndFeel() {
+        try {
+            if (isLinux()) {
+                for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
+                    if ("Nimbus".equals(info.getName())) {
+                        UIManager.setLookAndFeel(info.getClassName());
+                        return;
+                    }
+                }
+                UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
+            } else {
+                UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+            }
+        } catch (Exception ignored) {
+            // LAF por defecto de la JVM
+        }
+    }
+
+    /** Teclado español: ´ + a → á en {@link javax.swing.text.JTextComponent}. */
+    public static void configureKeyboardInput(JTextComponent field) {
+        if (isLinux() && field instanceof JComponent jc) {
+            jc.enableInputMethods(false);
+        }
     }
 
     /** Familias tipográficas UI por sistema (Segoe en Windows, Ubuntu/Cantarell en Linux). */

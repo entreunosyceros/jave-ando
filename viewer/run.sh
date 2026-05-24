@@ -20,4 +20,8 @@ fi
 "$JAVAC" -encoding UTF-8 -d out @out/sources.txt
 
 cd "$ROOT"
+# ibus + Swing: las teclas muertas (´+a) exigen varias pulsaciones; sin esto va directo al teclado X11
+if [[ "$(uname -s)" == "Linux" ]]; then
+  export XMODIFIERS=
+fi
 exec "$JAVA_BIN" -cp "$VIEWER/out" com.ifcd0112.viewer.Launcher
