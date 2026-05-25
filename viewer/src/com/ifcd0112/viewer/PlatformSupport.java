@@ -36,13 +36,35 @@ public final class PlatformSupport {
         return os.contains("linux") || os.contains("nix") || os.contains("nux");
     }
 
+    /** WSL / Linux embebido en Windows: Desktop.open y terminales GTK no funcionan. */
+    public static boolean isWsl() {
+        if (!isLinux()) {
+            return false;
+        }
+        String distro = System.getenv("WSL_DISTRO_NAME");
+        if (distro != null && !distro.isBlank()) {
+            return true;
+        }
+        try {
+            String version = Files.readString(Path.of("/proc/version"));
+            return version.toLowerCase().contains("microsoft");
+        } catch (IOException | SecurityException ignored) {
+            return false;
+        }
+    }
+
+    /** Linux nativo con escritorio, no WSL ni servidor sin GUI. */
+    public static boolean isDesktopLinux() {
+        return isLinux() && !isWsl();
+    }
+
     /**
      * En Linux, ibus + GtkLookAndFeel rompen teclas muertas en Swing (hay que pulsar ´ y la vocal varias veces).
      * Usar Nimbus/Metal y desactivar el marco IME de Java en campos de texto.
      */
     public static void installSwingLookAndFeel() {
         try {
-            if (isLinux()) {
+            if (isDesktopLinux()) {
                 for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
                     if ("Nimbus".equals(info.getName())) {
                         UIManager.setLookAndFeel(info.getClassName());
