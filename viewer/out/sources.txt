@@ -1,15 +1,19 @@
 src/com/ifcd0112/viewer/AboutDialog.java
 src/com/ifcd0112/viewer/AppIcons.java
 src/com/ifcd0112/viewer/AppInfo.java
+src/com/ifcd0112/viewer/CodeDiagnostic.java
+src/com/ifcd0112/viewer/CodeDiagnosticsService.java
 src/com/ifcd0112/viewer/CodeHighlightPane.java
 src/com/ifcd0112/viewer/CodeViewerDialog.java
 src/com/ifcd0112/viewer/DesktopActions.java
+src/com/ifcd0112/viewer/EditorBufferIndex.java
 src/com/ifcd0112/viewer/ExecutionService.java
 src/com/ifcd0112/viewer/ExerciseCatalog.java
 src/com/ifcd0112/viewer/ExerciseHelpDialog.java
 src/com/ifcd0112/viewer/Exercise.java
 src/com/ifcd0112/viewer/ExerciseTreePanel.java
 src/com/ifcd0112/viewer/HelpContent.java
+src/com/ifcd0112/viewer/JavacOutputParser.java
 src/com/ifcd0112/viewer/Launcher.java
 src/com/ifcd0112/viewer/MainFrame.java
 src/com/ifcd0112/viewer/MarkdownRenderer.java
@@ -17,6 +21,7 @@ src/com/ifcd0112/viewer/PlatformSupport.java
 src/com/ifcd0112/viewer/SolutionReader.java
 src/com/ifcd0112/viewer/SolutionWriter.java
 src/com/ifcd0112/viewer/StudentWorkspace.java
+src/com/ifcd0112/viewer/SyntaxHints.java
 src/com/ifcd0112/viewer/ThemePalette.java
 src/com/ifcd0112/viewer/UiTheme.java
 src/com/ifcd0112/viewer/ViewerBuild.java

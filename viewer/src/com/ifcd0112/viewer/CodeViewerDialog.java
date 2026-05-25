@@ -8,6 +8,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.List;
 
 public class CodeViewerDialog extends JDialog {
 
@@ -29,7 +30,10 @@ public class CodeViewerDialog extends JDialog {
     private JButton saveBtn;
     private JButton copyBtn;
     private JButton restoreBtn;
+    private JButton checkBtn;
     private JButton closeBtn;
+    private JLabel diagnosticsLabel;
+    private SwingWorker<CodeDiagnosticsService.AnalysisResult, Void> diagnosticsWorker;
 
     public static CodeViewerDialog forOfficialSolution(Frame owner, Exercise exercise, String code) {
         return new CodeViewerDialog(owner, exercise, code, EditorMode.OFFICIAL_SOLUTION, null);
@@ -53,13 +57,11 @@ public class CodeViewerDialog extends JDialog {
         codePane = new CodeHighlightPane();
         codePane.setCode(code, language);
         codePane.enableEditing(language);
+        codePane.setAfterEditHook(this::runDiagnosticsAsync);
 
-        JScrollPane scroll = new JScrollPane(codePane);
-        scroll.setBorder(BorderFactory.createEmptyBorder());
-        UiTheme.configureScroll(scroll, true, true);
-
-        buildLayout(exercise, scroll);
+        buildLayout(exercise, codePane);
         applyTheme();
+        runDiagnosticsAsync();
 
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         addWindowListener(new WindowAdapter() {
@@ -120,9 +122,14 @@ public class CodeViewerDialog extends JDialog {
         restoreBtn.setToolTipText("Descartar cambios no guardados y recargar desde disco");
         restoreBtn.addActionListener(e -> restoreFromDisk(restoreBtn));
 
+        checkBtn = UiTheme.primaryButton("Comprobar errores", p.primary(), p.primaryHover());
+        checkBtn.setToolTipText("Compila (Java) o revisa sintaxis básica y marca líneas con error");
+        checkBtn.addActionListener(e -> runDiagnosticsAsync());
+
         JPanel actions = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 0));
         actions.setOpaque(false);
         actions.add(restoreBtn);
+        actions.add(checkBtn);
         actions.add(copyBtn);
         actions.add(saveBtn);
 
@@ -132,13 +139,20 @@ public class CodeViewerDialog extends JDialog {
         topBar.add(titleCol, BorderLayout.CENTER);
         topBar.add(actions, BorderLayout.EAST);
 
+        diagnosticsLabel = new JLabel(" ");
+        diagnosticsLabel.setFont(UiTheme.FONT_UI.deriveFont(12f));
+
         closeBtn = UiTheme.primaryButton("Cerrar", p.primary(), p.primaryHover());
         closeBtn.addActionListener(e -> closeWithConfirm());
 
-        JPanel south = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        JPanel south = new JPanel(new BorderLayout(8, 0));
         south.setName("codeSouth");
         south.setBorder(new EmptyBorder(8, 14, 12, 14));
-        south.add(closeBtn);
+        south.add(diagnosticsLabel, BorderLayout.CENTER);
+        JPanel southActions = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
+        southActions.setOpaque(false);
+        southActions.add(closeBtn);
+        south.add(southActions, BorderLayout.EAST);
 
         JPanel content = new JPanel(new BorderLayout(0, 0));
         content.setName("codeContent");
@@ -158,11 +172,11 @@ public class CodeViewerDialog extends JDialog {
 
     private String hintHtml(Exercise exercise) {
         if (editorMode == EditorMode.STUDENT_WORK) {
-            return "<html>Edita <b>tu código</b> en <code>trabajo/</code> (tildes, ñ y teclado español). "
-                    + "<b>Guardar</b> no modifica la solución oficial. "
+            return "<html>Edita <b>tu código</b> en <code>trabajo/</code>. "
+                    + "<b>Comprobar errores</b> usa <code>javac</code> (Java). Resaltado al salir del editor. "
                     + "En varios <code>.java</code>, conserva <code>// ===== archivo.java =====</code>.</html>";
         }
-        return "<html>Editor de texto plano (tildes y ñ con teclado español). <b>Guardar</b> escribe en la solución oficial. "
+        return "<html><b>Comprobar errores</b> (javac en Java), resaltado al salir del editor. <b>Guardar</b> escribe en la solución oficial. "
                 + "En varios <code>.java</code>, conserva <code>// ===== archivo.java =====</code>.</html>";
     }
 
@@ -225,6 +239,7 @@ public class CodeViewerDialog extends JDialog {
                     : SolutionReader.readSolutionContent(exercise);
             savedBaseline = code;
             codePane.setCode(code, language);
+            runDiagnosticsAsync();
             restoreBtn.setText("Recargado");
             Timer timer = new Timer(1200, ev -> restoreBtn.setText("Restaurar"));
             timer.setRepeats(false);
@@ -281,6 +296,8 @@ public class CodeViewerDialog extends JDialog {
         UiTheme.refreshButton(closeBtn, p.primary(), p.primaryHover());
         Color[] neutral = UiTheme.neutralButtonColors();
         UiTheme.refreshButton(restoreBtn, neutral[0], neutral[1]);
+        UiTheme.refreshButton(checkBtn, p.primary(), p.primaryHover());
+        diagnosticsLabel.setForeground(p.textMuted());
 
         Component south = ((BorderLayout) getLayout()).getLayoutComponent(BorderLayout.SOUTH);
         if (south != null) {
@@ -291,5 +308,69 @@ public class CodeViewerDialog extends JDialog {
         codePane.refreshHighlightNow();
 
         repaint();
+    }
+
+    private void runDiagnosticsAsync() {
+        if (diagnosticsWorker != null && !diagnosticsWorker.isDone()) {
+            diagnosticsWorker.cancel(true);
+        }
+        checkBtn.setEnabled(false);
+        diagnosticsLabel.setText("Comprobando errores…");
+
+        String content = codePane.getText();
+        String defaultFile = defaultJavaFileName();
+
+        diagnosticsWorker = new SwingWorker<>() {
+            @Override
+            protected CodeDiagnosticsService.AnalysisResult doInBackground() {
+                Path root = projectRoot != null ? projectRoot : PlatformSupport.findProjectRoot();
+                return CodeDiagnosticsService.analyze(content, language, root, defaultFile);
+            }
+
+            @Override
+            protected void done() {
+                checkBtn.setEnabled(true);
+                if (isCancelled()) {
+                    return;
+                }
+                try {
+                    CodeDiagnosticsService.AnalysisResult result = get();
+                    codePane.setDiagnostics(result.diagnostics());
+                    updateDiagnosticsLabel(result.diagnostics());
+                } catch (Exception ex) {
+                    diagnosticsLabel.setText("No se pudo analizar el código.");
+                    codePane.setDiagnostics(List.of());
+                }
+            }
+        };
+        diagnosticsWorker.execute();
+    }
+
+    private void updateDiagnosticsLabel(List<CodeDiagnostic> items) {
+        long errors = items.stream()
+                .filter(d -> d.severity() == CodeDiagnostic.Severity.ERROR)
+                .count();
+        long warnings = items.stream()
+                .filter(d -> d.severity() == CodeDiagnostic.Severity.WARNING)
+                .count();
+        if (items.isEmpty()) {
+            diagnosticsLabel.setText(
+                    language.contains("java")
+                            ? "Sin errores de compilación ni avisos de sintaxis."
+                            : "Sin avisos de sintaxis detectados."
+            );
+            return;
+        }
+        diagnosticsLabel.setText(
+                errors + " error(es), " + warnings + " aviso(s). Haz clic en la lista para ir a la línea."
+        );
+    }
+
+    private String defaultJavaFileName() {
+        Path path = exercise.solutionPath();
+        if (path != null && path.toString().endsWith(".java")) {
+            return path.getFileName().toString();
+        }
+        return "Main.java";
     }
 }
