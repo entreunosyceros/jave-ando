@@ -189,7 +189,7 @@ public class MainFrame extends JFrame {
         view.add(themeMenuItem);
 
         JMenu help = new JMenu("Ayuda");
-        JMenuItem addExercises = new JMenuItem("Cómo añadir ejercicios…");
+        JMenuItem addExercises = new JMenuItem("Cómo añadir y gestionar ejercicios…");
         addExercises.addActionListener(e -> new ExerciseHelpDialog(this, projectRoot).setVisible(true));
         JMenuItem about = new JMenuItem("Acerca de " + AppInfo.NAME + "…");
         about.addActionListener(e -> new AboutDialog(this, projectRoot).setVisible(true));

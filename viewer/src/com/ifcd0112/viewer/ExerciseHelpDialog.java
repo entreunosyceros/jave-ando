@@ -10,7 +10,7 @@ public class ExerciseHelpDialog extends JDialog {
     private final JPanel southPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 
     public ExerciseHelpDialog(Frame owner, java.nio.file.Path projectRoot) {
-        super(owner, "Cómo añadir ejercicios", true);
+        super(owner, "Cómo añadir y gestionar ejercicios", true);
         setMinimumSize(new Dimension(720, 560));
         setLocationRelativeTo(owner);
 

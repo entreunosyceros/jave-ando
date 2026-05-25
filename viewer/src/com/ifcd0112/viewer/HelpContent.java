@@ -43,30 +43,39 @@ public final class HelpContent {
 
     private static String fallbackGuide() {
         return """
-                ## Cómo añadir nuevos ejercicios
+                ## Cómo añadir y gestionar ejercicios
 
-                Desde el menú **Ejercicios → Añadir ejercicio…** puedes registrar un ejercicio
-                eligiendo su `ENUNCIADO.md` y la solución sin editar código Java del visor.
+                ### Añadir (recomendado)
 
-                También puedes añadir ejercicios fijos editando `ExerciseCatalog.java` (ver README del repo).
+                1. Crea en el repositorio el **ENUNCIADO.md** y la **solución** (carpeta Java, `.sql`, `SOLUCION.md`, …).
+                2. Menú **Ejercicios → Añadir ejercicio…**
+                3. Id único, título, módulo del índice y tipo de solución.
+                4. **Elegir…** el enunciado (`.md`) y la solución (archivo o carpeta).
+                5. **Añadir al índice** — aparece al instante; se guarda en `ejercicios-personalizados/`.
 
-                ### POO
-                - Enunciado: `modulo-poo/NN-nombre/ENUNCIADO.md`
-                - Solución: `soluciones/modulo-poo/NN-nombre/*.java`
-                - Id: `poo-NN`, módulo: `Programación orientada a objetos`, tipo: `JAVA`, clase `Main`
+                | Tipo | Solución | Ejecutar en el visor |
+                |------|----------|----------------------|
+                | Java | Carpeta con `.java` | Sí (clase con `main`) |
+                | SQL | Archivo `.sql` | No |
+                | Markdown | `.md` (p. ej. SOLUCION.md) | No |
+                | Ninguno | Sin solución | No |
 
-                ### Bases de datos
-                - Enunciado: `modulo-bbdd/NN-nombre/ENUNCIADO.md`
-                - Solución SQL: archivo `.sql` en `soluciones/modulo-bbdd/`
-                - Solución teoría: `SOLUCION.md`
-                - Id: `bbdd-NN`, módulo: `Bases de datos`
+                ### Eliminar del índice
 
-                ### JDBC
-                - Enunciado: `modulo-bbdd/jdbc/NN-nombre/ENUNCIADO.md`
-                - Solución: carpeta Java en `soluciones/modulo-bbdd/jdbc/`
-                - Id: `jdbc-NN`, módulo: `Acceso a datos con JDBC`
+                - **Ejercicios → Eliminar ejercicio…** — quita el ejercicio del árbol.
+                - Añadidos por ti: se borra su `.properties`.
+                - Del curso (POO, BBDD…): solo se **oculta**; los archivos no se eliminan.
+                - **Restaurar ejercicios ocultos…** — recupera los del curso que ocultaste.
 
-                Tras editar el catálogo, recompila: `./viewer/run.sh`
+                ### Estructura de archivos
+
+                - Enunciado: p. ej. `modulo-poo/09-nombre/ENUNCIADO.md`
+                - Solución Java: `soluciones/modulo-poo/09-nombre/*.java`
+                - Solución SQL: `soluciones/modulo-bbdd/…/archivo.sql`
+
+                ### Catálogo fijo (avanzado)
+
+                Para ejercicios permanentes en el repo, edita `ExerciseCatalog.java` y recompila con `./viewer/run.sh`.
                 """;
     }
 }
