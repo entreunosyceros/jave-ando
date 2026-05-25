@@ -19,6 +19,7 @@ Incluye el visor gráfico **JAVe-Ando** (Swing) para leer enunciados, practicar 
 ├── trabajo/             # Tu código personal (JAVe-Ando — botón «Mi código»)
 │   ├── modulo-poo/      # Misma estructura que soluciones/
 │   └── modulo-bbdd/
+├── ejercicios-personalizados/  # Índice de ejercicios añadidos desde el menú Ejercicios
 ├── sql/                 # Scripts de creación de bases de datos
 ├── lib/                 # JAR del conector JDBC (opcional)
 ├── img/                 # Logo y recursos del visor
@@ -103,9 +104,9 @@ java -cp out com.ifcd0112.viewer.ViewerBuild
 
 | Botón | Función |
 |-------|---------|
-| **Mi código** | Abre un editor con resaltado de sintaxis sobre tu carpeta `trabajo/`. La primera vez puedes copiar la solución como punto de partida o crear un esqueleto `Main.java` (solo Java). **Guardar** escribe en `trabajo/`, no en `soluciones/`. |
+| **Mi código** | Abre un editor sobre tu carpeta `trabajo/` (resaltado de sintaxis al salir del cuadro de texto; **Comprobar errores** con `javac` en Java y avisos de sintaxis; líneas marcadas en rojo). **Guardar** escribe en `trabajo/`, no en `soluciones/`. |
 | **Ejecutar mi código** | Compila y ejecuta los `.java` de `trabajo/` del ejercicio seleccionado (solo ejercicios Java). |
-| **Ver solución** | Abre la solución oficial. Puedes editarla y **Guardar** en `soluciones/` (útil para docentes; el alumno debería usar «Mi código»). |
+| **Ver solución** | Abre la solución oficial con **Comprobar errores** y resaltado. Puedes editarla y **Guardar** en `soluciones/` (útil para docentes; el alumno debería usar «Mi código»). |
 | **Ejecutar solución** | Compila y ejecuta la versión oficial en `soluciones/`. |
 
 En ejercicios **SQL** o **teoría** (Markdown), «Mi código» permite editar tu `.sql` o `.md` en `trabajo/`; la ejecución SQL sigue haciéndose en MySQL/MariaDB.
@@ -125,13 +126,21 @@ En ejercicios **SQL** o **teoría** (Markdown), «Mi código» permite editar tu
   - Windows: Windows Terminal (`wt`), PowerShell o CMD.
   - macOS: Terminal.
 
+**Ejercicios**
+
+- **Añadir ejercicio…** — elige el **enunciado** (`.md`) y la **solución** (carpeta Java, `.sql`, `.md`, etc.) dentro del repositorio. El ejercicio aparece al instante en el índice.
+- **Eliminar ejercicio…** — quita cualquier ejercicio del índice. Los **añadidos por ti** se borran de `ejercicios-personalizados/`; los del **curso** solo se **ocultan** (no se borran archivos).
+- **Restaurar ejercicios ocultos…** — vuelve a mostrar en el índice un ejercicio del curso que habías ocultado.
+
+Los ejercicios personalizados se guardan en `ejercicios-personalizados/` (un `.properties` por ejercicio). Los ocultos del curso, en `ejercicios-personalizados/ocultos.properties`.
+
 **Ver**
 
 - Alternar **modo claro** / **modo oscuro**.
 
 **Ayuda**
 
-- **Cómo añadir ejercicios…** — guía integrada (contenido del README).
+- **Cómo añadir y gestionar ejercicios…** — guía del menú Ejercicios, archivos y catálogo (contenido del README).
 - **Acerca de** — información de JAVe-Ando y enlace al repositorio.
 
 ### Carpeta `trabajo/` (mi código)
@@ -154,19 +163,57 @@ En ejercicios **SQL** o **teoría** (Markdown), «Mi código» permite editar tu
 
 - Rutas con `java.nio.file` (válidas en Windows y Linux).
 - Detección de `JAVA_HOME` y mensajes de error si falta el JDK.
-- Botones e interfaz adaptados al aspecto del sistema (incl. GTK en Linux).
-- Apertura de carpetas y terminales con fallbacks según el sistema operativo.
+- **Windows:** `viewer\run.bat` (genera `sources.txt` sin BOM; pausa si falla compilación o arranque).
+- **WSL (Linux en Windows):** carpetas y terminales se abren en el **Explorador / Windows Terminal** del host (`explorer.exe`, `wt.exe`, `cmd.exe` vía `wslpath -w`).
+- **Linux con escritorio:** gnome-terminal, xdg-open, etc.
+- Botones e interfaz adaptados al aspecto del sistema (Nimbus en Linux nativo; LAF del sistema en Windows).
 
 ---
 
 ## Cómo añadir nuevos ejercicios
 
-Cada ejercicio necesita **archivos en disco** y una **entrada en el catálogo** del visor. Sigue los pasos según la categoría.
+Cada ejercicio necesita un **enunciado** (`ENUNCIADO.md`) y, normalmente, una **solución** en el repositorio. Puedes registrarlo en el índice del visor **sin programar** desde el menú **Ejercicios**.
 
-### Paso común: enunciado
+### Forma recomendada: menú Ejercicios (JAVe-Ando)
 
-1. Crea una carpeta con nombre descriptivo y prefijo numérico, por ejemplo `09-interfaces-avanzadas`.
-2. Dentro, añade `ENUNCIADO.md` en Markdown (títulos `#`, listas, tablas, bloques de código con ` ``` `).
+1. Prepara en disco el **enunciado** (archivo `.md`) y la **solución** (carpeta con `.java`, archivo `.sql`, `SOLUCION.md`, etc.) dentro de este repositorio.
+2. En el visor: **Ejercicios → Añadir ejercicio…**
+3. Rellena el formulario:
+   - **Id** — identificador único (p. ej. `extra-01`, `poo-09`)
+   - **Título** — texto que aparece en el índice
+   - **Módulo** — grupo del árbol (p. ej. `Programación orientada a objetos`, `Ejercicios añadidos`)
+   - **Tipo de solución** — Java, SQL, Markdown o ninguno
+   - **Clase principal** — solo para Java (`Main`, `ListarAlumnosDemo`, …)
+4. Pulsa **Elegir…** junto a **Enunciado** y selecciona el `.md`.
+5. Pulsa **Elegir…** junto a **Solución** y selecciona el archivo o carpeta.
+6. Confirma con **Añadir al índice** — el ejercicio aparece al instante en el árbol.
+
+Los datos se guardan en `ejercicios-personalizados/` (un archivo `.properties` por ejercicio). No hace falta recompilar el visor.
+
+**Tipos de solución en el formulario:**
+
+| Tipo | Qué elegir como solución | Ejecutar desde el visor |
+|------|--------------------------|-------------------------|
+| **Java** | Carpeta con `.java` | Sí (indica la clase con `main`) |
+| **SQL** | Archivo `.sql` | No |
+| **Markdown** | `SOLUCION.md` u otro `.md` | No |
+| **Ninguno** | Dejar sin solución o ruta vacía | No |
+
+El tipo se deduce en parte al elegir la solución (carpeta → Java, `.sql` → SQL, `.md` → Markdown).
+
+### Eliminar o ocultar ejercicios del índice
+
+| Menú | Efecto |
+|------|--------|
+| **Eliminar ejercicio…** | Quita el ejercicio del índice. Los **añadidos por ti** borran su `.properties`. Los del **curso** solo se **ocultan** (los archivos del repo no se eliminan). |
+| **Restaurar ejercicios ocultos…** | Vuelve a mostrar ejercicios del curso que habías ocultado (`ejercicios-personalizados/ocultos.properties`). |
+
+---
+
+### Paso 1: crear el enunciado
+
+1. Crea una carpeta con nombre descriptivo, por ejemplo `modulo-poo/09-interfaces-avanzadas/`.
+2. Dentro, añade `ENUNCIADO.md` en Markdown.
 
 Ejemplo de cabecera:
 
@@ -177,142 +224,52 @@ Ejemplo de cabecera:
 **Nivel:** Intermedio
 ```
 
-### Paso común: solución
+### Paso 2: crear la solución
 
-Coloca la solución en `soluciones/`, manteniendo la misma estructura relativa que el enunciado:
+Coloca la solución en `soluciones/`, con la misma estructura relativa que el enunciado:
 
-| Tipo | Dónde guardar la solución |
-|------|---------------------------|
-| Java (POO o JDBC) | Carpeta con `.java` (p. ej. `soluciones/modulo-poo/09-interfaces-avanzadas/`) |
-| SQL | Un archivo `.sql` (p. ej. `soluciones/modulo-bbdd/06-vistas/vistas.sql`) |
-| Teoría (diseño ER, etc.) | `SOLUCION.md` en la carpeta correspondiente bajo `soluciones/modulo-bbdd/` |
-| Proyecto sin solución publicada | No hace falta archivo; usa ruta vacía en el catálogo |
+| Tipo | Dónde guardar |
+|------|----------------|
+| Java (POO o JDBC) | `soluciones/modulo-poo/09-interfaces-avanzadas/` (varios `.java` si hace falta) |
+| SQL | `soluciones/modulo-bbdd/06-vistas/vistas.sql` |
+| Teoría (E-R, etc.) | `soluciones/modulo-bbdd/…/SOLUCION.md` |
 
-### Paso común: registrar en el visor
+En proyectos Java con varios archivos, el editor del visor usa marcas `// ===== archivo.java =====` al leer o guardar varios `.java` a la vez.
 
-Edita `viewer/src/com/ifcd0112/viewer/ExerciseCatalog.java` y añade una línea `add(...)` en el constructor, **en el bloque de la categoría** que corresponda:
+### Ejemplos por categoría
 
-```java
-add(
-    "poo-09",                              // id único (prefijo de categoría + número)
-    "09 — Interfaces avanzadas",           // título en el índice
-    "Programación orientada a objetos",    // módulo (agrupa el árbol)
-    mod.resolve("09-interfaces-avanzadas/ENUNCIADO.md"),   // enunciado
-    sol.resolve("modulo-poo/09-interfaces-avanzadas"),     // solución
-    Exercise.SolutionType.JAVA,            // tipo (ver tabla abajo)
-    "Main"                                 // clase con main (solo JAVA); null si no aplica
-);
-```
+**POO (Java)** — enunciado: `modulo-poo/09-tu-carpeta/ENUNCIADO.md`, solución: `soluciones/modulo-poo/09-tu-carpeta/`, tipo **Java**, clase `Main`.
 
-**Tipos de solución** (`Exercise.SolutionType`):
+**Bases de datos (SQL)** — enunciado: `modulo-bbdd/06-vistas/ENUNCIADO.md`, solución: `soluciones/modulo-bbdd/06-vistas/vistas.sql`, tipo **SQL**.
 
-| Tipo | Uso | `mainClass` | Botón ejecutar |
-|------|-----|-------------|----------------|
-| `JAVA` | Código Java compilable | Nombre de la clase con `main` (`Main`, `ListarAlumnosDemo`, …) | Sí |
-| `SQL` | Archivo `.sql` | `null` | No (solo ver código) |
-| `MARKDOWN` | Respuesta en Markdown (`SOLUCION.md`) | `null` | No |
-| `NONE` | Enunciado sin solución en el visor | `null` | No |
+**Teoría (Markdown)** — solución: `SOLUCION.md`, tipo **Markdown**.
 
-Tras modificar el catálogo, **recompila el visor** con `./viewer/run.sh`, `viewer\run.bat` o, desde `viewer/`:
-
-```bash
-java -cp out com.ifcd0112.viewer.ViewerBuild
-```
+**JDBC** — enunciado: `modulo-bbdd/jdbc/04-tu-carpeta/ENUNCIADO.md`, solución: carpeta Java en `soluciones/modulo-bbdd/jdbc/…`, tipo **Java**, clase principal según tu `main` (no tiene que llamarse `Main`).
 
 ---
 
-### Añadir ejercicio de POO
+### Forma avanzada: catálogo fijo en el código
 
-1. Carpeta del enunciado: `modulo-poo/NN-nombre-corto/ENUNCIADO.md`
-2. Solución: `soluciones/modulo-poo/NN-nombre-corto/*.java`
-3. En `ExerciseCatalog.java`:
+Si quieres que el ejercicio forme parte del repositorio para todos los usuarios (sin depender de `ejercicios-personalizados/`), edita `viewer/src/com/ifcd0112/viewer/ExerciseCatalog.java` y añade una línea en el constructor:
 
 ```java
-add("poo-09", "09 — Tu título", "Programación orientada a objetos",
-        mod.resolve("09-tu-carpeta/ENUNCIADO.md"),
-        sol.resolve("modulo-poo/09-tu-carpeta"),
+add("poo-09", "09 — Interfaces avanzadas", "Programación orientada a objetos",
+        mod.resolve("09-interfaces-avanzadas/ENUNCIADO.md"),
+        sol.resolve("modulo-poo/09-interfaces-avanzadas"),
         Exercise.SolutionType.JAVA, "Main");
 ```
 
-- Usa id `poo-NN` (número correlativo).
-- La clase indicada en el último parámetro debe tener `public static void main`.
-
----
-
-### Añadir ejercicio de Bases de datos (SQL o teoría)
-
-1. Carpeta del enunciado: `modulo-bbdd/NN-nombre/ENUNCIADO.md`
-2. Solución:
-   - **SQL:** `soluciones/modulo-bbdd/NN-nombre/archivo.sql`
-   - **Teoría / E-R:** `soluciones/modulo-bbdd/NN-nombre/SOLUCION.md`
-
-**Ejemplo SQL:**
-
-```java
-add("bbdd-06", "06 — Vistas", "Bases de datos",
-        bbdd.resolve("06-vistas/ENUNCIADO.md"),
-        sol.resolve("modulo-bbdd/06-vistas/vistas.sql"),
-        Exercise.SolutionType.SQL, null);
-```
-
-**Ejemplo teoría (Markdown):**
-
-```java
-add("bbdd-06", "06 — Normalización", "Bases de datos",
-        bbdd.resolve("06-normalizacion/ENUNCIADO.md"),
-        sol.resolve("modulo-bbdd/06-normalizacion/SOLUCION.md"),
-        Exercise.SolutionType.MARKDOWN, null);
-```
-
-- Usa id `bbdd-NN`.
-
----
-
-### Añadir ejercicio JDBC
-
-1. Carpeta del enunciado: `modulo-bbdd/jdbc/NN-nombre/ENUNCIADO.md`
-2. Solución: `soluciones/modulo-bbdd/jdbc/NN-nombre/` (varios `.java` si hace falta)
-3. En `ExerciseCatalog.java`:
-
-```java
-add("jdbc-04", "04 — Tu ejercicio JDBC", "Acceso a datos con JDBC",
-        bbdd.resolve("jdbc/04-tu-carpeta/ENUNCIADO.md"),
-        sol.resolve("modulo-bbdd/jdbc/04-tu-carpeta"),
-        Exercise.SolutionType.JAVA, "Main");
-```
-
-- Usa id `jdbc-NN`.
-- Si la clase principal no se llama `Main`, indica el nombre real (como en `ListarAlumnosDemo` del ejercicio 01).
-- Recuerda configurar `database.properties` y el JAR en `lib/` para ejecutar desde el visor.
-
----
-
-### Añadir proyecto integrador (u otra categoría nueva)
-
-1. Enunciado en `modulo-bbdd/proyecto-integrador/ENUNCIADO.md` (o nueva carpeta).
-2. Sin solución en el visor:
-
-```java
-add("proj-02", "Proyecto — Otro tema", "Proyecto integrador",
-        bbdd.resolve("otro-proyecto/ENUNCIADO.md"),
-        Path.of(""),
-        Exercise.SolutionType.NONE, null);
-```
-
-Para una **categoría nueva** en el árbol, usa un texto de módulo distinto en el tercer parámetro de `add` (por ejemplo `"Prácticas extra"`). Todos los ejercicios con el mismo módulo aparecerán agrupados bajo ese nombre.
+Tras modificar el catálogo, **recompila** con `./viewer/run.sh` o `viewer\run.bat`.
 
 ---
 
 ### Comprobación rápida
 
-1. `./viewer/run.sh` o `viewer\run.bat` — el ejercicio aparece en el índice bajo su módulo.
-2. Al seleccionarlo, se muestra el enunciado.
-3. **Mi código** crea o abre `trabajo/…` y permite guardar tu versión.
-4. En ejercicios `JAVA`, **Ejecutar mi código** y **Ejecutar solución** muestran la salida en la consola.
-5. **Ver solución** abre la solución oficial.
-6. **Herramientas → Abrir carpeta «mi código»** abre el directorio correcto.
-
-Opcional: añade el enlace en la sección [Orden recomendado](#orden-recomendado) de este README.
+1. El ejercicio aparece en el **índice** bajo su módulo.
+2. Al seleccionarlo, se muestra el **enunciado**.
+3. **Mi código** abre o crea tu versión en `trabajo/`.
+4. En Java: **Ejecutar mi código** y **Ejecutar solución** muestran la consola.
+5. **Ver solución** abre la solución oficial; **Comprobar errores** analiza el código (Java con `javac`).
 
 ---
 
