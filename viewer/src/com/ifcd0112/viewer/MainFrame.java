@@ -168,6 +168,18 @@ public class MainFrame extends JFrame {
         tools.add(openEnunciadoTerminal);
         tools.add(openWorkTerminal);
 
+        JMenu exercises = new JMenu("Ejercicios");
+        JMenuItem addExercise = new JMenuItem("Añadir ejercicio…");
+        addExercise.addActionListener(e -> addCustomExercise());
+        JMenuItem removeExercise = new JMenuItem("Eliminar ejercicio…");
+        removeExercise.addActionListener(e -> removeCustomExercise());
+        exercises.add(addExercise);
+        exercises.add(removeExercise);
+        JMenuItem restoreHidden = new JMenuItem("Restaurar ejercicios ocultos…");
+        restoreHidden.addActionListener(e -> restoreHiddenExercises());
+        exercises.addSeparator();
+        exercises.add(restoreHidden);
+
         JMenu view = new JMenu("Ver");
         themeMenuItem = new JMenuItem(themeToggleLabel());
         themeMenuItem.addActionListener(e -> {
@@ -187,9 +199,48 @@ public class MainFrame extends JFrame {
 
         bar.add(file);
         bar.add(tools);
+        bar.add(exercises);
         bar.add(view);
         bar.add(help);
         return bar;
+    }
+
+    private void addCustomExercise() {
+        AddExerciseDialog dialog = new AddExerciseDialog(this, projectRoot, catalog);
+        dialog.setVisible(true);
+        Exercise created = dialog.getCreatedExercise();
+        if (created != null) {
+            refreshExerciseIndex(created);
+            statusLabel.setText("Ejercicio añadido: " + created.title());
+        }
+    }
+
+    private void removeCustomExercise() {
+        RemoveExerciseDialog dialog = new RemoveExerciseDialog(this, catalog, lastSelected);
+        dialog.setVisible(true);
+        if (dialog.wasRemoved()) {
+            refreshExerciseIndex(null);
+            statusLabel.setText("Ejercicio eliminado del índice.");
+        }
+    }
+
+    private void restoreHiddenExercises() {
+        RestoreHiddenDialog dialog = new RestoreHiddenDialog(this, catalog);
+        dialog.setVisible(true);
+        if (dialog.wasRestored()) {
+            refreshExerciseIndex(null);
+            statusLabel.setText("Ejercicio restaurado en el índice.");
+        }
+    }
+
+    private void refreshExerciseIndex(Exercise selectAfter) {
+        treePanel.reload(catalog);
+        if (selectAfter != null) {
+            treePanel.selectExercise(selectAfter);
+        } else {
+            treePanel.selectFirstExercise();
+        }
+        showSelectedExercise();
     }
 
     private String themeToggleLabel() {

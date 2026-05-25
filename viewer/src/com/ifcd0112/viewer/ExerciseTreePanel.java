@@ -22,22 +22,7 @@ public class ExerciseTreePanel extends JPanel {
         setLayout(new BorderLayout());
         setOpaque(true);
 
-        DefaultMutableTreeNode root = new DefaultMutableTreeNode("Todos los ejercicios");
-        for (Exercise ex : catalog.getAll()) {
-            exerciseNodes.put(ex, new DefaultMutableTreeNode(ex));
-        }
-
-        Map<String, DefaultMutableTreeNode> modules = new LinkedHashMap<>();
-        for (Exercise ex : catalog.getAll()) {
-            DefaultMutableTreeNode moduleNode = modules.computeIfAbsent(ex.module(), name -> {
-                DefaultMutableTreeNode n = new DefaultMutableTreeNode(new ModuleItem(name));
-                root.add(n);
-                return n;
-            });
-            moduleNode.add(exerciseNodes.get(ex));
-        }
-
-        DefaultTreeModel model = new DefaultTreeModel(root);
+        DefaultTreeModel model = buildModel(catalog);
         tree = new JTree(model);
         tree.setRootVisible(false);
         tree.setShowsRootHandles(true);
@@ -93,6 +78,34 @@ public class ExerciseTreePanel extends JPanel {
                 scroll.getViewport().getView().setBackground(indexBg);
             }
         }
+    }
+
+    /** Reconstruye el índice tras añadir o eliminar ejercicios. */
+    public void reload(ExerciseCatalog catalog) {
+        exerciseNodes.clear();
+        DefaultTreeModel model = buildModel(catalog);
+        tree.setModel(model);
+        expandAll();
+        tree.revalidate();
+        tree.repaint();
+    }
+
+    private DefaultTreeModel buildModel(ExerciseCatalog catalog) {
+        exerciseNodes.clear();
+        DefaultMutableTreeNode root = new DefaultMutableTreeNode("Todos los ejercicios");
+        for (Exercise ex : catalog.getAll()) {
+            exerciseNodes.put(ex, new DefaultMutableTreeNode(ex));
+        }
+        Map<String, DefaultMutableTreeNode> modules = new LinkedHashMap<>();
+        for (Exercise ex : catalog.getAll()) {
+            DefaultMutableTreeNode moduleNode = modules.computeIfAbsent(ex.module(), name -> {
+                DefaultMutableTreeNode n = new DefaultMutableTreeNode(new ModuleItem(name));
+                root.add(n);
+                return n;
+            });
+            moduleNode.add(exerciseNodes.get(ex));
+        }
+        return new DefaultTreeModel(root);
     }
 
     public void addSelectionListener(javax.swing.event.TreeSelectionListener listener) {

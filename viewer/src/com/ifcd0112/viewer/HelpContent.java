@@ -45,7 +45,10 @@ public final class HelpContent {
         return """
                 ## Cómo añadir nuevos ejercicios
 
-                Cada ejercicio necesita archivos en disco y una entrada en `ExerciseCatalog.java`.
+                Desde el menú **Ejercicios → Añadir ejercicio…** puedes registrar un ejercicio
+                eligiendo su `ENUNCIADO.md` y la solución sin editar código Java del visor.
+
+                También puedes añadir ejercicios fijos editando `ExerciseCatalog.java` (ver README del repo).
 
                 ### POO
                 - Enunciado: `modulo-poo/NN-nombre/ENUNCIADO.md`
