@@ -1,0 +1,14 @@
+# Configuración de conexión JDBC
+# Copia este archivo como database.properties y ajusta los valores
+#
+# La URL puede incluir academia_idiomas aunque la base aún no exista:
+# «Probar conexión» comprueba el servidor; crear la base es el ejercicio 01 o el script 01.
+
+jdbc.url=jdbc:mysql://localhost:3306/academia_idiomas?useSSL=false&serverTimezone=Europe/Madrid
+jdbc.user=root
+jdbc.password=tu_password
+jdbc.driver=com.mysql.cj.jdbc.Driver
+
+# Para MariaDB usar:
+# jdbc.url=jdbc:mariadb://localhost:3306/academia_idiomas
+# jdbc.driver=org.mariadb.jdbc.Driver

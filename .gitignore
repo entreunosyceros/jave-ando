@@ -1,0 +1,20 @@
+# Compilación del visor
+viewer/out/*.class
+viewer/out/com/
+build/
+dist/
+jave-ando.jar
+
+
+# Trabajo personal del alumno (JAVe-Ando)
+trabajo/**/*
+!trabajo/README.md
+
+# Credenciales JDBC locales (JAVe-Ando)
+modulo-bbdd/jdbc/config/database.properties
+
+# Historial de la consola SQL (JAVe-Ando)
+ejercicios-personalizados/sql-historial.txt
+
+# Posiciones del diagrama de esquema (JAVe-Ando)
+ejercicios-personalizados/esquema-diagrama/
